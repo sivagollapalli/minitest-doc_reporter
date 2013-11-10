@@ -25,28 +25,20 @@ module Minitest
       end
 
       def start
+        puts
         self.start_time = Time.now
       end
 
       def record(result)
-        puts format_header(result.class)
+        puts format_header(result)
         puts format_result(result)
         puts
 
-        if result.error?
-          puts format_error_info(result)
-          puts
-        end
+        puts failure_info(result) unless result.passed?
 
-        if result.failure
-          puts pad(result.failure.to_s)
-          puts
-        end
-
-        self.count += 1
-
-        self.results << result if not result.passed? or result.skipped?
+        update_statistics(result)
       end
+
 
       def report
         super
@@ -66,6 +58,21 @@ module Minitest
 
       private
 
+      def failure_info(result)
+        if result.error?
+          puts pad(format_error_info(result))
+          puts
+        elsif result.failure
+          result.failure.to_s.each_line {|l| puts pad(l)}
+          puts
+        end
+      end
+
+      def update_statistics(result)
+        self.count += 1
+        self.results << result unless result.passed? || result.skipped?
+      end
+
       def statistics
         "#{format_result_type('Errors', errors, :red)} #{format_divider}" + \
           "#{format_result_type('Failures', failures, :red)} #{format_divider}" + \
@@ -84,32 +91,42 @@ module Minitest
       def format_error_info(result)
         e = result.failure.exception
         bt = Minitest.filter_backtrace e.backtrace
-        pad(ANSI.bold {e.class.to_s} + "\n" + pad(e.message.to_s) + "\n" + \
-            format_backtrace(bt))
+        ANSI.bold {e.class.to_s} + "\n" + pad(e.message.to_s) + "\n" + \
+            format_backtrace(bt)
       end
 
       def format_backtrace(bt)
         output = ""
-        bt.each {|l| output << l}
-        pad output
+        bt.each {|l| output << pad(l)}
+        output
       end
 
       def format_result(result)
         output = ""
-        if result.passed? 
-          output =  ANSI.green {result.name}
+        name = format_test_description result
+
+        if result.passed?
+          output =  ANSI.green {name}
         else
-          output = ANSI.red {result.name}
+          output = ANSI.red {name}
         end
+
         pad output
       end
 
-      def format_header(header)
-        ANSI.bold(header)
+      def format_test_description(result)
+        verb = result.name.split[0].split("_").last
+        phrase = result.name.split[1..-1].join " "
+        "#{verb} #{phrase}"
+      end
+
+      def format_header(result)
+        ANSI.bold(result.class)
       end
 
       def format_tests_run_count(count, total_time)
-        ANSI.bold "#{count} tests run in #{total_time}"
+        time = ANSI.bold total_time.to_s
+        "#{count} tests run in #{time} seconds."
       end
 
       def format_result_type(type, count, colour)
