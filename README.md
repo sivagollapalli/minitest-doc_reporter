@@ -1,6 +1,8 @@
 minitest-doc-reporter
 =====================
 
+[![Gem Version](https://badge.fury.io/rb/gemfury.png)](http://badge.fury.io/rb/gemfury)
+
 A more detailed reporter for minitest inspired by the documentation output of
 Rspec.
 
