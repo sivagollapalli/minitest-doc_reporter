@@ -19,6 +19,6 @@ gem "minitest-doc_reporter"
 
 Usage
 -----
-Add to following to the top of your minitest file or you spec_helper file:
+Add the following to the top of your minitest file or you spec_helper file:
 
 ```require 'minitest/doc_reporter'```
