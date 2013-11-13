@@ -1,6 +1,6 @@
 # minitest-doc-reporter
 
-[![Gem Version](https://badge.fury.io/rb/minitest-doc_reporter.png)]
+![Gem Version](https://badge.fury.io/rb/minitest-doc_reporter.png)
 
 A more detailed reporter for minitest inspired by the documentation output of
 Rspec.
